@@ -1,0 +1,16 @@
+{
+  "name": "homework02",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/hoffy.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "mocha tests/hoffy-test.js"
+  },
+  "repository": {
+  },
+  "author": "",
+  "license": "ISC",
+}
