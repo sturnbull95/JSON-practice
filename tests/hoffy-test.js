@@ -33,11 +33,11 @@ describe('hoffy', function() {
             return `${firstName} ${lastName}`; 
         }
         it('creates a new function that calls the old function and returns the old functions value', function() {
-            expect(maybe(createFullName)('Frederick', 'Functionstein')).to.be.equal('Frederick Functionstein');
+            expect(maybe(createFullName('Frederick', 'Functionstein'))).to.be.equal('Frederick Functionstein');
         });
         it('creates a new function that returns undefined if any of the arguments passed to it are null or undefined', function() {
-            expect(maybe(createFullName)(null, 'Functionstein')).to.be.undefined;
-            expect(maybe(createFullName)('Freddy', undefined)).to.be.undefined;
+            expect(maybe(createFullName(null, 'Functionstein'))).to.be.undefined;
+            expect(maybe(createFullName('Freddy', undefined))).to.be.undefined;
         });
     });
     describe('mapWith', function() {
