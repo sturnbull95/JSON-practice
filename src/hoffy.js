@@ -1,44 +1,44 @@
 // hoffy.js
 
 function prod(num1){
-  var result = 1;
   if(arguments.length == 0){
     return undefined;
   }
-  for(var i = 0; i < arguments.length; i++){
-    result *= arguments[i];
-  }
-  return result;
+  return [].reduce.call(arguments,function(product,currentNumber){
+    return product * currentNumber;
+  });
+
 }
 
 function any(arr, fn){
-  var bool = false;
-  while(bool != true){
-    for(var i = 0; i < arr.length; i++){
-      if(fn(arr[i]) == true){
-        bool = true;
-      }
+  var returnVal = false;
+  return arr.reduce(function(num,currentNum){
+    if(fn(currentNum) == true){
+      returnVal = true;
     }
-  }
-  return bool;
+    if(fn(currentNum) != true && returnVal != true){
+      returnVal = false;
+    }
+
+    return returnVal;
+  });
 }
 
 function maybe(fn){
-
   return function(...args){
-    for(var i = 0; i < arguments.length; i++){
-      if(arguments[i] == null || arguments[i] == undefined){
-        return undefined;
+    var placeHolder = true;
+    args.map(function(element){
+      if(element == null || element == undefined){
+        placeHolder = false;
+        returnVal = undefined;
       }
-      else{
-        val = fn(...arguments);
+      if(element != null && element != undefined && placeHolder != false){
+        returnVal = fn(...args);
       }
-    }
-    return val;
+    });
+    return returnVal;
   }
-
-
-}
+  }
 
 function constrainDecorator(fn, min, max){
   //console.log(arguments.length);
@@ -71,23 +71,59 @@ function constrainDecorator(fn, min, max){
 
 function limitCallsDecorator(fn,n){
   var count = 0;
-  return function(...arguments){
-    for(var i = 0; i < n; i++){
+  return function(...args){
+    args.map(function(element){
       if(count < n){
-        num = fn(...arguments);
+        returnVal = fn(...args);
         count++;
       }
       else{
-        num = undefined;
+        returnVal = undefined;
       }
-      return num;
+    });
+    return returnVal;
+  }
+}
+
+function mapWith(fn){
+  return function(...args){
+    var arr = [];
+    args.map(function(element){
+      element.map(function(ele){
+        arr.push(fn(ele));
+      });
+    });
+    return arr;
+  }
+}
+
+function simpleINIParse(s){
+  var arr = s.split(/\r?\n/);
+  var obj = {};
+  var value = "";
+  arr.map(function(element){
+    var singleArr = element.split('=');
+    if(singleArr.length == 2){
+      var name = singleArr[0];
+      value = singleArr[1];
+      obj[name] = value;
     }
+  });
+  console.log(obj);
+  return obj;
+}
+
+function readFileWith(fn){
+  
 }
 
 module.exports = {
     prod: prod,
     any: any,
     maybe: maybe,
-    constrainDecorator: constrainDecorator
-
+    constrainDecorator: constrainDecorator,
+    limitCallsDecorator: limitCallsDecorator,
+    mapWith: mapWith,
+    simpleINIParse: simpleINIParse,
+    readFileWith: readFileWith
 }
