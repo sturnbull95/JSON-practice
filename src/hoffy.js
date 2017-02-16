@@ -1,22 +1,22 @@
 // hoffy.js
-
-function prod(num1){
-  if(arguments.length == 0){
+const fs = require('fs');
+function prod(...arguments){
+  if(arguments.length === 0){
     return undefined;
   }
-  return [].reduce.call(arguments,function(product,currentNumber){
+  return arguments.reduce(function(product,currentNumber){
     return product * currentNumber;
   });
 
 }
 
 function any(arr, fn){
-  var returnVal = false;
+  let returnVal = false;
   return arr.reduce(function(num,currentNum){
-    if(fn(currentNum) == true){
+    if(fn(currentNum) === true){
       returnVal = true;
     }
-    if(fn(currentNum) != true && returnVal != true){
+    if(fn(currentNum) !== true && returnVal !== true){
       returnVal = false;
     }
 
@@ -26,34 +26,36 @@ function any(arr, fn){
 
 function maybe(fn){
   return function(...args){
-    var placeHolder = true;
+    let placeHolder = true;
+    let returnVal = "";
     args.map(function(element){
-      if(element == null || element == undefined){
+      if(element === null || element === undefined){
         placeHolder = false;
         returnVal = undefined;
       }
-      if(element != null && element != undefined && placeHolder != false){
+      if(element !== null && element !== undefined && placeHolder !== false){
         returnVal = fn(...args);
       }
     });
     return returnVal;
-  }
+  };
   }
 
 function constrainDecorator(fn, min, max){
   //console.log(arguments.length);
-  var bool = true;
+  let bool = true;
+  let num = "";
   if(arguments.length < 3){
     bool = false;
   }
-  if(arguments[1] == null || arguments[1] == undefined){
+  if(arguments[1] === null || arguments[1] === undefined){
     bool = false;
   }
-  if(arguments[2] == null || arguments[2] == undefined){
+  if(arguments[2] === null || arguments[2] === undefined){
     bool = false;
   }
   return function(...arguments){
-      if(bool == false){
+      if(bool === false){
         num = fn(...arguments);
       }
       if(arguments[0] < min){
@@ -66,13 +68,13 @@ function constrainDecorator(fn, min, max){
         num = fn(...arguments);
       }
       return num;
-    }
+    };
 }
 
 function limitCallsDecorator(fn,n){
-  var count = 0;
+  let count = 0;
+  let returnVal = "";
   return function(...args){
-    args.map(function(element){
       if(count < n){
         returnVal = fn(...args);
         count++;
@@ -80,41 +82,65 @@ function limitCallsDecorator(fn,n){
       else{
         returnVal = undefined;
       }
-    });
     return returnVal;
-  }
+  };
 }
 
 function mapWith(fn){
   return function(...args){
-    var arr = [];
+    const arr = [];
+    console.log("outputting mapwith contents\n");
+    console.log(args);
     args.map(function(element){
-      element.map(function(ele){
-        arr.push(fn(ele));
-      });
+      // if(typeof(element) === "string"){
+      //   arr.push(fn(element));
+      // }
+      // else{
+        element.map(function(ele){
+          arr.push(fn(ele));
+        });
+      //}
     });
+    console.log("arr");
+    console.log(typeof(arr));
+    console.log(arr);
     return arr;
-  }
+  };
 }
 
+
 function simpleINIParse(s){
-  var arr = s.split(/\r?\n/);
-  var obj = {};
-  var value = "";
+  var arr = s.split(/[\r,\n]+/);
+  console.log(arr);
+  let obj = {};
+  let value = "";
   arr.map(function(element){
-    var singleArr = element.split('=');
-    if(singleArr.length == 2){
-      var name = singleArr[0];
+    const singleArr = element.split('=');
+    if(singleArr.length === 2){
+      const name = singleArr[0];
       value = singleArr[1];
       obj[name] = value;
     }
   });
+  console.log("INI-----");
   console.log(obj);
   return obj;
 }
 
 function readFileWith(fn){
-  
+  const newFn = mapWith(fn);
+  return function(fileName,callback){
+    console.log("outside");
+    fs.readFile(fileName,'utf8',function(err,data){
+      if(err){
+        console.log("error");
+        data = undefined;
+        callback();
+      }
+      data = (newFn([data]))[0];
+      callback(err,data);
+    });
+  };
 }
 
 module.exports = {
@@ -126,4 +152,4 @@ module.exports = {
     mapWith: mapWith,
     simpleINIParse: simpleINIParse,
     readFileWith: readFileWith
-}
+};
